@@ -5,11 +5,6 @@ public class CameraControl : MonoBehaviour {
 
     public float cameraOffset = 2f;
 
-    //void Awake()
-    //{ 
-    //            transform.localPosition
-    //}
-
     void Update()
     {
         Vector2 cameraPos = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2);
