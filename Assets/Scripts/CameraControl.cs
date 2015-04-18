@@ -5,10 +5,10 @@ public class CameraControl : MonoBehaviour {
 
     public float cameraOffset = 2f;
 
-    void Awake()
-    {
-        transform.position = new Vector3(0, 0, -300);
-    }
+    //void Awake()
+    //{ 
+    //            transform.localPosition
+    //}
 
     void Update()
     {
