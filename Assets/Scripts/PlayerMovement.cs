@@ -3,64 +3,62 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour {
 
+    public static PlayerMovement instance;
+
+    public LeanTweenType jumpEase = LeanTweenType.easeOutCirc;
     public float playerSpeed = 30f;
     public float jumpForce = 1f;
-    public float yMovement = 0f;
-    public float gravity = 60f;
+    public float gravity = -2f;
     public Rigidbody body;
 
-    private float direction = 0f;
+    private float xDirection = 0f;
+    private float yDirection = 0f;
     private float jump = 0f;
     private Vector3 movementVector;
-    private bool canCheckLand = false;
 
     public enum PlayerState { onGround, inAir };
     public PlayerState state = PlayerState.onGround;
 
     void Start()
     {
-        yMovement = 0f;
+        instance = this;
     }
 
     void Update()
     {
-        direction = Input.GetAxisRaw("Horizontal");
-        
-        if (Mathf.Abs(direction) < 0.01f)
-        {
-            direction = 0f;
-        }
+        xDirection = Input.GetAxisRaw("Horizontal");
 
-        if (Input.GetButtonDown("Jump") && state == PlayerState.onGround)
+        if (Input.GetButtonDown("Jump"))
         {
             state = PlayerState.inAir;
+            LeanTween.moveLocalY(gameObject, transform.localPosition.y + jumpForce, 0.3f).setEase(jumpEase).setIgnoreTimeScale(true);
+        }
 
-            yMovement = jumpForce;
+        if (Mathf.Abs(xDirection) < 0.01f)
+        {
+            xDirection = 0f;
+        }
 
-            StartCoroutine("CheckForLand");
+        if (state == PlayerState.inAir)
+        {
+            yDirection = gravity;
         }
         else
         {
-            yMovement -= gravity * Time.deltaTime;
+            yDirection = 0f;
         }
 
-        movementVector = new Vector3(direction * playerSpeed * Time.deltaTime / Time.timeScale, yMovement, 0);
+        movementVector = new Vector3(xDirection * playerSpeed, yDirection, 0) * Time.deltaTime / Time.timeScale;
 
         transform.Translate(movementVector);
-
-        if (Mathf.Abs(body.velocity.y) < 0.1f
-            && state == PlayerState.inAir
-            && canCheckLand == true)
-        {
-            state = PlayerState.onGround;
-            yMovement = 0f;
-        }
     }
 
-    IEnumerator CheckForLand()
+    void OnCollisionEnter(Collision other)
     {
-        canCheckLand = false;
-        yield return new WaitForSeconds(0.1f);
-        canCheckLand = true;
+        if (other.gameObject.tag.Equals("Ground") 
+            || other.gameObject.tag.Equals("InvisibleBullet"))
+        {
+            state = PlayerState.onGround;
+        }
     }
 }
