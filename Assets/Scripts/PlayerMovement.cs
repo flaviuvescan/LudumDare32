@@ -27,11 +27,11 @@ public class PlayerMovement : MonoBehaviour {
         if(Input.GetButtonDown("Jump") && state == PlayerState.onGround)
         {
             state = PlayerState.inAir;
-            body.AddForce(Vector3.up * jumpForce * 1000f * Time.deltaTime);
+            body.AddForce(Vector3.up * jumpForce * 1000f * Time.deltaTime );
             StartCoroutine("CheckForLand");
         }
 
-        movementVector = new Vector3(direction * playerSpeed  * Time.deltaTime, 0, 0);
+        movementVector = new Vector3((direction * playerSpeed * Time.deltaTime) / Time.timeScale, 0, 0);
 
         transform.Translate(movementVector);
 
