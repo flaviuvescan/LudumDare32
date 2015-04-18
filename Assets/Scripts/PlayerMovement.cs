@@ -5,6 +5,8 @@ public class PlayerMovement : MonoBehaviour {
 
     public float playerSpeed = 30f;
     public float jumpForce = 1f;
+    public float yMovement = 0f;
+    public float gravity = 60f;
     public Rigidbody body;
 
     private float direction = 0f;
@@ -15,23 +17,34 @@ public class PlayerMovement : MonoBehaviour {
     public enum PlayerState { onGround, inAir };
     public PlayerState state = PlayerState.onGround;
 
+    void Start()
+    {
+        yMovement = 0f;
+    }
+
     void Update()
     {
-        direction = Input.GetAxis("Horizontal");
+        direction = Input.GetAxisRaw("Horizontal");
         
         if (Mathf.Abs(direction) < 0.01f)
         {
             direction = 0f;
         }
 
-        if(Input.GetButtonDown("Jump") && state == PlayerState.onGround)
+        if (Input.GetButtonDown("Jump") && state == PlayerState.onGround)
         {
             state = PlayerState.inAir;
-            body.AddForce(Vector3.up * jumpForce * 1000f * Time.deltaTime );
+
+            yMovement = jumpForce;
+
             StartCoroutine("CheckForLand");
         }
+        else
+        {
+            yMovement -= gravity * Time.deltaTime;
+        }
 
-        movementVector = new Vector3((direction * playerSpeed * Time.deltaTime) / Time.timeScale, 0, 0);
+        movementVector = new Vector3(direction * playerSpeed * Time.deltaTime / Time.timeScale, yMovement, 0);
 
         transform.Translate(movementVector);
 
@@ -40,7 +53,7 @@ public class PlayerMovement : MonoBehaviour {
             && canCheckLand == true)
         {
             state = PlayerState.onGround;
-            CameraShake.instance.ShakeCamera();
+            yMovement = 0f;
         }
     }
 
